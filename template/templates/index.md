@@ -8,6 +8,7 @@ This file tracks the top-K recently accessed files under `templates/` and all de
 
 | File | Description | Last action | Reason | Updated |
 |---|---|---|---|---|
+| `llm-wiki-template.md` | Copy-pasteable LLM Wiki pattern prompt/template. | move | Moved from the repository root into the reusable templates boundary. | 2026-04-19 |
 | `architecture-template.md` | Template for required directory architecture files. | create | Defines the structural contract format. | 2026-04-19 |
 | `index-template.md` | Template for required directory recency indexes. | create | Defines the top-K index format. | 2026-04-19 |
 | `source-entry-template.md` | Template for source manifest entries. | create | Defines source provenance fields. | 2026-04-19 |

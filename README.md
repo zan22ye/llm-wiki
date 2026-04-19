@@ -1,67 +1,70 @@
 # LLM Wiki
 
-LLM Wiki is a file-native template foundation for building knowledge bases that are maintained by LLM agents.
+一个文件原生的知识库基座，用于构建由 LLM agent 维护的个人或团队知识库。
 
-It is not a specific knowledge base, application, or platform. It provides a reusable structure for individuals, organizations, projects, automation systems, and other agents to accumulate raw sources and generated knowledge over time.
+设计思想来自 `llm-wiki.md`。
 
-## Core Idea
+## 核心思路
 
-Most LLM document workflows retrieve from raw material at query time. LLM Wiki adds a persistent middle layer: an agent-maintained wiki that compiles, updates, cross-references, and audits knowledge as sources and questions arrive.
+多数 LLM 文档工作流是在查询时从原始资料检索再生成答案——知识不积累，每次都从零推导。
 
-The knowledge base has two primary layers:
+LLM Wiki 在原始资料和查询之间加入一个持久中间层：一个由 agent 维护的 wiki。每摄入一个新来源，agent 就更新这个 wiki——补充页面、修订摘要、标记矛盾、强化交叉引用。知识编译一次，持续保鲜，不在每次查询时重复推导。
 
-- `raw/`: immutable or source-controlled original material.
-- `wiki/`: generated, synthesized, maintained knowledge derived from sources.
+## 面向谁
 
-The directory structure is part of the knowledge base. Every directory carries local structural metadata so future agents can understand why files live where they do.
+想维护一个可复用基座、在此之上构建个性化知识库的开发者。
 
-## Directory Contract
+## 结构
 
-Every directory must contain:
-
-- `architecture.md`: explains this directory's classification logic.
-- `index.md`: tracks the top-K recently accessed files under this directory and descendants.
-
-`architecture.md` is structural. It does not list pages.
-
-`index.md` is operational. It does not try to be a full catalog.
-
-## Initial Layout
-
-```text
-.
-├── AGENTS.md
-├── README.md
-├── architecture.md
-├── index.md
-├── raw/
-│   ├── architecture.md
-│   ├── index.md
-│   ├── sources.md
-│   └── llm-wiki.md
-├── templates/
-│   ├── architecture.md
-│   ├── index.md
-│   ├── architecture-template.md
-│   ├── index-template.md
-│   ├── source-entry-template.md
-│   └── wiki-page-template.md
-└── wiki/
-    ├── architecture.md
-    ├── index.md
-    └── overview.md
+```
+llm-wiki.md      ← 设计纲领
+template/        ← 可复制的知识库骨架
+  AGENTS.md      ← agent 行为规范
+  raw/           ← 原始资料层
+  wiki/          ← 生成知识层
+  templates/     ← 页面模板
 ```
 
-## How To Start
+## 路线图
 
-1. Add sources under `raw/`.
-2. Register each source in `raw/sources.md`.
-3. Ask an LLM agent to ingest the source according to `AGENTS.md`.
-4. Let the agent create or update pages under `wiki/`.
-5. Keep each directory's `architecture.md` and `index.md` current as the knowledge base evolves.
+### M0 · 骨架 ✓
 
-## Scaling
+目录契约、页面模板、AGENTS.md 行为规范。结构稳定，可作为任何个性化知识库的起点。
 
-This template intentionally does not include a global catalog, search engine, CLI, or web app in v1.
+### M1 · 工具层
 
-As a knowledge base grows, add those only when the local `index.md` files, shell search, and editor search are no longer enough.
+让 agent 能高效操作知识库。
+
+- **搜索**：自建 Python 脚本，对 `wiki/` 做全文检索，后续可升级向量搜索
+- **摄入**：基于 Jina Reader 的摄入脚本，网页一键转为标准 `raw/` 文件
+- **健康检查**：Python 脚本，检测结构问题和内容级缺陷
+
+### M2 · 展示层
+
+让知识库内容可以被人类消费。
+
+- Obsidian vault 配置模板
+- Marp 演示文稿模板
+- 轻量 web 渲染方案
+
+### M3 · Agent 层
+
+从单一 AGENTS.md 扩展为专用 agent 体系。
+
+- 摄入 agent、巡检 agent、合成 agent、对话 agent
+- 每个 agent 有独立行为契约和权限边界
+
+### M4 · 个性化框架
+
+让不同场景的开发者可以快速 fork 出自己的版本。
+
+- 场景扩展指南（研究型、读书型、团队型）
+- 自定义 agent 规范模板
+- 配置层抽象
+
+## 快速开始
+
+1. 复制 `template/` 到你的项目
+2. 阅读 `template/AGENTS.md` 了解 agent 行为规范
+3. 将第一个来源放入 `raw/`，注册到 `raw/sources.md`
+4. 让 agent 开始摄入
