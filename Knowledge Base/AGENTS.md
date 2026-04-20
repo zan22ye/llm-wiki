@@ -92,19 +92,68 @@ When sources conflict, record the conflict, affected claims, and current uncerta
 
 Stable answers to recurring or important questions should be written back into `wiki/`.
 
-## Classification Workflow
+## Configuration
 
-Before creating a file:
+Read `config.yml` at the start of every session. It controls model selection, API keys, and operating mode.
 
-1. Read the parent directory's `architecture.md`.
-2. Decide whether the file belongs within an existing boundary.
-3. If no boundary fits, propose a classification change.
-4. If the change is accepted, update the parent `architecture.md`.
-5. Create the new directory with `architecture.md` and `index.md` if needed.
-6. Add the file.
-7. Update relevant `index.md` files.
+Key fields:
 
-If the classification is unclear, ask for a decision or present two to three options. Do not place files arbitrarily.
+- `mode`: `auto` executes all steps without confirmation; `confirm` presents a plan and waits for approval before writing anything.
+- `models.summarizer`: small model used for summary generation.
+- `models.classifier`: model used for classification decisions.
+- `models.main`: model used for wiki page authoring and synthesis.
+- `wiki.k`: maximum entries kept in each `index.md`.
+
+## Ingest Protocol
+
+Triggered when a new source file or URL is provided.
+
+### Step 1 — Summarize
+
+Call `models.summarizer` to produce a structured summary of the source:
+
+```
+title:       (string)
+type:        article | paper | transcript | data | other
+topics:      (list of strings)
+key_claims:  (list of strings)
+date:        (YYYY-MM-DD or empty)
+```
+
+For URLs, fetch content via Jina Reader (`GET https://r.jina.ai/{url}`) before summarizing.
+
+### Step 2 — Classify
+
+Using the summary, traverse the directory tree top-down:
+
+1. Read the current directory's `architecture.md`.
+2. Match the summary's `topics` and `type` against defined child boundaries.
+3. If a child boundary fits, descend into it and repeat.
+4. If no boundary fits, evaluate whether the source represents a new stable conceptual category:
+   - If yes: propose creating a new child directory with its own `architecture.md` and `index.md`.
+   - If no: place the file in the current directory.
+5. Stop at the deepest fitting boundary.
+
+Do not create directories for speculative categories. A new directory requires a clear conceptual boundary distinct from all existing ones.
+
+### Step 3 — Mode Check
+
+If `mode: confirm`: present the proposed file path, any new directories, and the full update set. Wait for approval before proceeding.
+
+If `mode: auto`: proceed immediately.
+
+### Step 4 — Place and Update
+
+Execute in order:
+
+1. Write the source file to the classified path under `raw/`.
+2. Append an entry to `raw/sources.md`.
+3. Create a wiki summary page for the source under `wiki/` using `templates/wiki-page-template.md`.
+4. Update every `index.md` on the path from the root to the placed file.
+5. Update `wiki/index.md`.
+6. If a new directory was created: write its `architecture.md` and `index.md` before adding any files; update the parent `architecture.md` to reflect the new child boundary.
+
+This update set is fixed. Do not skip steps or add ad hoc updates outside this list.
 
 ## Health Checks
 

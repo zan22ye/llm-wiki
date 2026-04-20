@@ -1,0 +1,22 @@
+# LLM Wiki 配置文件
+
+# 操作模式
+# auto    - 直接执行，不等待确认
+# confirm - 展示计划，等待确认后再执行
+mode: auto
+
+# 模型配置
+models:
+  summarizer: gpt-4o-mini      # 摘要生成（小模型）
+  classifier: gpt-4o-mini      # 分类判断（小模型）
+  main: claude-sonnet-4-6      # wiki 页面撰写与合成（主模型）
+
+# API 密钥
+api_keys:
+  openai: ""
+  anthropic: ""
+
+# Wiki 配置
+wiki:
+  k: 5                    # 每个 index.md 保留的最近访问条数
+  new_dir_min_sources: 3  # 触发新建子目录所需的最少同类来源数
