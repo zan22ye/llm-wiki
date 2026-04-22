@@ -104,6 +104,27 @@ Key fields:
 - `models.main`: model used for wiki page authoring and synthesis.
 - `wiki.k`: maximum entries kept in each `index.md`.
 
+## Agent Tools
+
+### `search_wiki`
+
+Use `search_wiki` when `index.md` navigation is insufficient or when a query may touch multiple wiki pages.
+
+Command:
+
+```bash
+python3 scripts/search.py --kb "<knowledge-base-root>" --query "<query>" --scope wiki --top-k 5
+```
+
+Arguments:
+
+- `--kb`: path to the knowledge base root.
+- `--query`: keyword query.
+- `--scope`: `wiki`, `raw`, or `all`; default to `wiki` for synthesized knowledge lookups.
+- `--top-k`: maximum result count.
+
+Read the returned JSON paths and match snippets before opening full files. Prefer `scope=wiki` for normal answers and `scope=all` when provenance or raw-source wording matters.
+
 ## Ingest Protocol
 
 Triggered when a new source file or URL is provided.
@@ -154,6 +175,10 @@ Execute in order:
 6. If a new directory was created: write its `architecture.md` and `index.md` before adding any files; update the parent `architecture.md` to reflect the new child boundary.
 
 This update set is fixed. Do not skip steps or add ad hoc updates outside this list.
+
+### M1+ Cross-Update Hook
+
+After M1 search tooling is available, use `search_wiki` with the new source topics to find existing wiki pages that may need updates. Only update pages with clear topical overlap or direct citation impact; preserve source provenance in every touched page.
 
 ## Health Checks
 
